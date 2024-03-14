@@ -1,4 +1,4 @@
-package com.hsbc.challenge.view
+package com.hsbc.challenge.view.compose
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

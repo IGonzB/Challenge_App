@@ -1,4 +1,4 @@
-package com.hsbc.challenge.view
+package com.hsbc.challenge.view.compose
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -19,6 +19,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -62,7 +63,6 @@ fun MainScreen(viewModel: MainViewModel) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainContent(viewModel: MainViewModel, data: Data) {
     Row(
@@ -79,7 +79,7 @@ fun MainContent(viewModel: MainViewModel, data: Data) {
         OutlinedTextField(
             value = data.place,
             onValueChange = {},
-            modifier = Modifier.width(200.dp),
+            modifier = Modifier.width(200.dp).testTag("Location"),
             singleLine = true,
         )
     }
@@ -97,7 +97,7 @@ fun MainContent(viewModel: MainViewModel, data: Data) {
         OutlinedTextField(
             value = data.value.toString(),
             onValueChange = {},
-            modifier = Modifier.width(200.dp),
+            modifier = Modifier.width(200.dp).testTag("Temperature"),
             singleLine = true
         )
     }

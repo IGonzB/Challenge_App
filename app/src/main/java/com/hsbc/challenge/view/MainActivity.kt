@@ -9,6 +9,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.hsbc.challenge.App
+import com.hsbc.challenge.view.compose.MainScreen
 import com.hsbc.challenge.view.theme.AppTheme
 import com.hsbc.challenge.viewmodel.MainViewModel
 
