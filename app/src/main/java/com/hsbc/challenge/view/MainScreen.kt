@@ -23,13 +23,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.hsbc.challenge.R
+import com.hsbc.challenge.model.Data
+import com.hsbc.challenge.util.common.UiDataState.*
 import com.hsbc.challenge.viewmodel.MainViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(viewModel: MainViewModel) {
 
-    val weatherInfo = viewModel.weatherInfo.collectAsState().value
+    val uiDataState = viewModel.weatherInfo.collectAsState()
 
     Card(
         modifier = Modifier
@@ -49,52 +50,116 @@ fun MainScreen(viewModel: MainViewModel) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                Arrangement.End
-            ) {
-                Text(
-                    text = stringResource(R.string.location),
-                    Modifier
-                        .padding(top = 15.dp, start = 10.dp, end = 10.dp)
-                        .width(95.dp),
-                    textAlign = TextAlign.Center
-                )
-                OutlinedTextField(
-                    value = weatherInfo.place,
-                    onValueChange = {},
-                    modifier = Modifier.width(200.dp),
-                    singleLine = true,
-                )
-            }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 10.dp),
-                Arrangement.End
-            ) {
-                Text(
-                    text = stringResource(R.string.temperature),
-                    Modifier.padding(top = 15.dp, start = 10.dp, end = 10.dp),
-                    textAlign = TextAlign.Center
-                )
-                OutlinedTextField(
-                    value = weatherInfo.value.toString(),
-                    onValueChange = {},
-                    modifier = Modifier.width(200.dp),
-                    singleLine = true
-                )
-            }
-            Column(
-                modifier = Modifier
-                    .padding(top = 30.dp)
-            ) {
-                Button(
-                    onClick = viewModel::requestNextWeatherInfo
-                ) {
-                    Text("Next Random Location")
+            when (uiDataState.value) {
+                is Initial -> MainContentInitial(viewModel = viewModel)
+                is Loading -> LoadingView()
+                is Loaded -> MainContent(viewModel, (uiDataState.value as Loaded).data)
+                is Error -> ErrorView((uiDataState.value as Error).error) {
+                   viewModel.requestNextWeatherInfo()
                 }
             }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MainContent(viewModel: MainViewModel, data: Data) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        Arrangement.End
+    ) {
+        Text(
+            text = stringResource(R.string.location),
+            Modifier
+                .padding(top = 15.dp, start = 10.dp, end = 10.dp)
+                .width(95.dp),
+            textAlign = TextAlign.Center
+        )
+        OutlinedTextField(
+            value = data.place,
+            onValueChange = {},
+            modifier = Modifier.width(200.dp),
+            singleLine = true,
+        )
+    }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 10.dp),
+        Arrangement.End
+    ) {
+        Text(
+            text = stringResource(R.string.temperature),
+            Modifier.padding(top = 15.dp, start = 10.dp, end = 10.dp),
+            textAlign = TextAlign.Center
+        )
+        OutlinedTextField(
+            value = data.value.toString(),
+            onValueChange = {},
+            modifier = Modifier.width(200.dp),
+            singleLine = true
+        )
+    }
+    Column(
+        modifier = Modifier
+            .padding(top = 30.dp)
+    ) {
+        Button(
+            onClick = viewModel::requestNextWeatherInfo
+        ) {
+            Text("Next Random Location")
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MainContentInitial(viewModel: MainViewModel) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        Arrangement.End
+    ) {
+        Text(
+            text = stringResource(R.string.location),
+            Modifier
+                .padding(top = 15.dp, start = 10.dp, end = 10.dp)
+                .width(95.dp),
+            textAlign = TextAlign.Center
+        )
+        OutlinedTextField(
+            value = "",
+            onValueChange = {},
+            modifier = Modifier.width(200.dp),
+            singleLine = true,
+        )
+    }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 10.dp),
+        Arrangement.End
+    ) {
+        Text(
+            text = stringResource(R.string.temperature),
+            Modifier.padding(top = 15.dp, start = 10.dp, end = 10.dp),
+            textAlign = TextAlign.Center
+        )
+        OutlinedTextField(
+            value = "",
+            onValueChange = {},
+            modifier = Modifier.width(200.dp),
+            singleLine = true
+        )
+    }
+    Column(
+        modifier = Modifier
+            .padding(top = 30.dp)
+    ) {
+        Button(
+            onClick = viewModel::requestNextWeatherInfo
+        ) {
+            Text("Next Random Location")
         }
     }
 }

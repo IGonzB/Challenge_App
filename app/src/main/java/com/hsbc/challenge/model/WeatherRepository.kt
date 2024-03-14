@@ -1,7 +1,8 @@
 package com.hsbc.challenge.model
 
-import com.hsbc.challenge.util.Resource
+import com.hsbc.challenge.util.common.Resource
+import kotlinx.coroutines.flow.Flow
 
 interface WeatherRepository {
-    suspend fun getWeatherData(): Resource<WeatherResponse>
+    fun getWeatherData(): Flow<Resource<WeatherResponse>>
 }

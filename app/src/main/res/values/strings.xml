@@ -1,5 +1,10 @@
 <resources>
-    <string name="app_name">App</string>
+    <string name="app_name">HSBC Challenge App</string>
     <string name="location">Location</string>
     <string name="temperature">Temperature</string>
+    <string name="error_network_unavailable">A problem occurred while connecting to the network, Please try again.</string>
+    <string name="error_service_unavailable">Currently Service is not available, Please try again later.</string>
+    <string name="error_resource_not_found">Required information is not available at the moment, Please try again later.</string>
+    <string name="error_server">There is some unknown error happened, if it happens again then please report, Please try again.</string>
+    <string name="error_general">There was some issue loading information, Please try again.</string>
 </resources>
