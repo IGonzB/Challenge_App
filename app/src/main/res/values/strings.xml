@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">App</string>
+    <string name="location">Location</string>
+    <string name="temperature">Temperature</string>
+</resources>
