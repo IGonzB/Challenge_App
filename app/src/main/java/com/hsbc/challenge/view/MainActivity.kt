@@ -20,6 +20,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -45,33 +46,9 @@ class MainActivity : ComponentActivity() {
         (this.application as App).appComponent.viewModelFactory()
     }
 
-    private fun observeLiveData(){
-        lifecycleScope.launch {
-            viewModel.state.collect {
-                when(it){
-                    is DashboardState.Idle -> {
-                        Log.d("Worked", "Idle")
-                    }
-                    is DashboardState.Loading -> {
-                        handleProgressbar(View.VISIBLE)
-                        Log.d("Worked", "Loading")
-                    }
-                    is DashboardState.Books -> {
-                        handleProgressbar(View.GONE)
-                        Toast.makeText(applicationContext, "Books ${it.book.size}", Toast.LENGTH_LONG).show()
-                    }
-                    is DashboardState.Error -> {
-                        handleProgressbar(View.GONE)
-                        Log.d("Worked", "Error")
-                    }
-                }
-            }
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        observeLiveData()
+
         setContent {
             AppTheme {
                 Surface(
@@ -86,6 +63,9 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun MainScreen(viewModel: MainViewModel) {
+
+        val uiDataState = viewModel.state.collectAsState()
+
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -105,9 +85,13 @@ class MainActivity : ComponentActivity() {
             ) {
 
                 when (uiDataState.value) {
-                    is UiDataState.Initial -> MainContentInitial(viewModel = viewModel)
+                    is UiDataState.Idle -> MainContent(viewModel, null)
                     is UiDataState.Loading -> LoadingView()
-                    is UiDataState.Loaded -> MainContent(viewModel, (uiDataState.value as UiDataState.Loaded).data)
+                    is UiDataState.Loaded -> MainContent(
+                        viewModel,
+                        (uiDataState.value as UiDataState.Loaded).data
+                    )
+
                     is UiDataState.Error -> ErrorView((uiDataState.value as UiDataState.Error).error) {
                         viewModel.requestNextWeatherInfo()
                     }
@@ -117,7 +101,7 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun MainContent(viewModel: MainViewModel, data: Data) {
+    fun MainContent(viewModel: MainViewModel, data: Data?) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             Arrangement.End
@@ -130,7 +114,7 @@ class MainActivity : ComponentActivity() {
                 textAlign = TextAlign.Center
             )
             OutlinedTextField(
-                value = data.place,
+                value = data?.place ?: "",
                 onValueChange = {},
                 modifier = Modifier
                     .width(200.dp)
@@ -150,7 +134,7 @@ class MainActivity : ComponentActivity() {
                 textAlign = TextAlign.Center
             )
             OutlinedTextField(
-                value = data.value.toString(),
+                value = data?.value?.toString() ?: "",
                 onValueChange = {},
                 modifier = Modifier
                     .width(200.dp)
@@ -164,61 +148,7 @@ class MainActivity : ComponentActivity() {
         ) {
             Button(
                 onClick = {
-                    lifecycleScope.launch{
-                        viewModel.userIntent.send(HomeIntent.FetchNextWeather)
-                    }
-                }
-            ) {
-                Text("Next Random Location")
-            }
-        }
-    }
-
-    @Composable
-    fun MainContentInitial(viewModel: MainViewModel) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            Arrangement.End
-        ) {
-            Text(
-                text = stringResource(R.string.location),
-                Modifier
-                    .padding(top = 15.dp, start = 10.dp, end = 10.dp)
-                    .width(95.dp),
-                textAlign = TextAlign.Center
-            )
-            OutlinedTextField(
-                value = "",
-                onValueChange = {},
-                modifier = Modifier.width(200.dp),
-                singleLine = true,
-            )
-        }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 10.dp),
-            Arrangement.End
-        ) {
-            Text(
-                text = stringResource(R.string.temperature),
-                Modifier.padding(top = 15.dp, start = 10.dp, end = 10.dp),
-                textAlign = TextAlign.Center
-            )
-            OutlinedTextField(
-                value = "",
-                onValueChange = {},
-                modifier = Modifier.width(200.dp),
-                singleLine = true
-            )
-        }
-        Column(
-            modifier = Modifier
-                .padding(top = 30.dp)
-        ) {
-            Button(
-                onClick = {
-                    lifecycleScope.launch{
+                    lifecycleScope.launch {
                         viewModel.userIntent.send(HomeIntent.FetchNextWeather)
                     }
                 }

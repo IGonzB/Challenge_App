@@ -10,7 +10,6 @@ import com.hsbc.challenge.util.common.UiDataState
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -22,7 +21,7 @@ class MainViewModel @Inject constructor(
     ViewModel() {
 
     val userIntent = Channel<HomeIntent>(Channel.UNLIMITED)
-    private val _state = MutableStateFlow<UiDataState<Data>>(UiDataState.Initial())
+    private val _state = MutableStateFlow<UiDataState<Data>>(UiDataState.Idle())
     val state: StateFlow<UiDataState<Data>>
         get() = _state
 
@@ -42,17 +41,17 @@ class MainViewModel @Inject constructor(
 
     fun requestNextWeatherInfo() {
         viewModelScope.launch {
-            weatherRepository.getWeatherData()
-                .catch { }
-                .collect {
-                    when (it) {
-                        is Resource.Success -> _state.value =
-                            UiDataState.Loaded(it.data.temperature.data.random())
 
-                        is Resource.Error -> _state.value =
-                            UiDataState.Error(errorTypeToErrorTextConverter.convert(it.error))
-                    }
+            _state.value = UiDataState.Loading()
+
+            when(val resourceData = weatherRepository.getWeatherData()) {
+                is Resource.Success -> {
+                    _state.value = UiDataState.Loaded(resourceData.data.temperature.data.random())
                 }
+                is Resource.Error -> {
+                    _state.value = UiDataState.Error(errorTypeToErrorTextConverter.convert(resourceData.error))
+                }
+            }
         }
     }
 }
